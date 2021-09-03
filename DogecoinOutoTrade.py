@@ -17,6 +17,12 @@ def get_start_time(ticker):
     start_time = df.index[0]
     return start_time
 
+def get_ma15(ticker):
+    """15일 이동 평균선 조회"""
+    df = pyupbit.get_ohlcv(ticker, interval="day", count=15)
+    ma15 = df['close'].rolling(15).mean().iloc[-1]
+    return ma15
+
 def get_balance(ticker):
     """잔고 조회"""
     balances = upbit.get_balances()
@@ -27,12 +33,6 @@ def get_balance(ticker):
             else:
                 return 0
     return 0
-
-def get_ma15(ticker):
-    """15일 이동 평균선 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=15)
-    ma15 = df['close'].rolling(15).mean().iloc[-1]
-    return ma15
 
 def get_current_price(ticker):
     """현재가 조회"""
@@ -49,9 +49,9 @@ while True:
         start_time = get_start_time("KRW-DOGE")
         end_time = start_time + datetime.timedelta(days=1)
 
-        #9시< 현재 < 8:59:50
         if start_time < now < end_time - datetime.timedelta(seconds=10):
-            target_price = get_target_price("KRW-DOGE", 0.5)
+            target_price = get_target_price("KRW-DOGE", 0.3)
+            ma15 = get_ma15("KRW-DOGE")
             current_price = get_current_price("KRW-DOGE")
             if target_price < current_price and ma15 < current_price:
                 krw = get_balance("KRW")
